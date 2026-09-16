@@ -129,17 +129,9 @@ export function LeadershipSection() {
                 animationDelay: `${index * 150}ms`
               }}
             >
-              {/* Photo Container with animated border and hover zoom */}
-              <div className="relative mb-5 overflow-hidden rounded-sm bg-slate-100 border border-slate-200 aspect-square flex items-center justify-center shadow-inner">
+              {/* Photo Container */}
+              <div className="relative mb-5 overflow-hidden rounded-sm bg-slate-50 border border-slate-200 aspect-square flex items-center justify-center">
                 <LeaderPhoto leader={leader} />
-
-                {/* Floating Role Tag on Photo */}
-                {leader.aka && (
-                  <div className="absolute top-3 right-3 bg-slate-900/85 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-1 rounded-sm shadow-md flex items-center gap-1.5 border border-white/20">
-                    <Award className="w-3.5 h-3.5 text-swadha-orange" />
-                    <span>{leader.aka}</span>
-                  </div>
-                )}
               </div>
 
               {/* Leader Info */}
@@ -148,8 +140,13 @@ export function LeadershipSection() {
                   <h3 className="font-heading text-xl font-bold text-swadha-dark group-hover:text-swadha-orange transition-colors">
                     {leader.name}
                   </h3>
+                  {leader.aka && (
+                    <p className="text-xs font-semibold text-swadha-orange mt-0.5">
+                      ({leader.aka})
+                    </p>
+                  )}
 
-                  <div className="mt-1.5 mb-3.5">
+                  <div className="mt-2 mb-3.5">
                     <span className={`inline-block text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full border ${leader.badgeTone} shadow-xs`}>
                       {leader.role}
                     </span>
