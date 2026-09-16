@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Lock, Power, PlayCircle } from 'lucide-react';
 import { HeroCarousel, PhotoMarquee } from '../components/HeroCarousel';
+import { LeadershipSection } from '../components/LeadershipSection';
 import { Button, Modal } from '../components/ui';
 import { Session } from '../types';
 
@@ -195,6 +196,9 @@ export default function Home() {
           </Button>
         </div>
       </Modal>
+
+      {/* Leadership & Mentors Section */}
+      <LeadershipSection />
 
       <section className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-4">
