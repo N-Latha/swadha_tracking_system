@@ -38,6 +38,19 @@ const SLIDES = [
 export function HeroCarousel() {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
+  const [activeSession, setActiveSession] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('currentSession');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.status === 'ACTIVE') {
+          setActiveSession(parsed);
+        }
+      }
+    } catch (e) {}
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -68,24 +81,45 @@ export function HeroCarousel() {
       ))}
 
       <div className="relative z-10 h-full max-w-6xl mx-auto px-4 flex flex-col justify-center">
-        <h1 className="font-heading text-4xl md:text-6xl font-bold text-swadha-orange leading-tight max-w-2xl">
-          {SLIDES[index].title}
+        <div className="inline-flex items-center gap-2 bg-swadha-orange/20 border border-swadha-orange/40 text-swadha-orange px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-[0.18em] mb-4 w-fit backdrop-blur-xs">
+          Swadha Foundation &bull; Lab Portal
+        </div>
+        <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight max-w-3xl drop-shadow-md">
+          Swadha <span className="text-swadha-orange">Machine Tracking System</span>
         </h1>
-        <p className="mt-4 text-swadha-green font-semibold tracking-[0.12em] uppercase text-sm md:text-base max-w-xl">
-          {SLIDES[index].subtitle}
+        <p className="mt-3 text-swadha-green font-semibold tracking-[0.08em] uppercase text-sm md:text-base max-w-xl transition-all duration-500">
+          {SLIDES[index].title} &bull; {SLIDES[index].subtitle}
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate('/student/login')}
-            className="bg-swadha-orange hover:bg-swadha-orangeDark text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-sm transition-colors"
-          >
-            Student check-in
-          </button>
+          {activeSession ? (
+            <>
+              <button
+                onClick={() => navigate('/student/session')}
+                className="bg-swadha-green hover:bg-swadha-greenDark text-white text-xs font-bold uppercase tracking-wider px-6 py-3.5 rounded-sm transition-colors flex items-center gap-2 shadow-md"
+              >
+                <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                Resume Session ({activeSession.machineId})
+              </button>
+              <button
+                onClick={() => navigate('/student/condition')}
+                className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider px-6 py-3.5 rounded-sm transition-colors shadow-md"
+              >
+                End Session
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => navigate('/student/login')}
+              className="bg-swadha-orange hover:bg-swadha-orangeDark text-white text-xs font-bold uppercase tracking-wider px-6 py-3.5 rounded-sm transition-colors shadow-md"
+            >
+              Student check-in
+            </button>
+          )}
           <button
             onClick={() => navigate('/admin/login')}
-            className="bg-white text-swadha-dark hover:bg-swadha-light text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-sm transition-colors"
+            className="bg-white text-swadha-dark hover:bg-swadha-light text-xs font-bold uppercase tracking-wider px-6 py-3.5 rounded-sm transition-colors shadow-md"
           >
-            Know more
+            Admin check-in
           </button>
         </div>
       </div>

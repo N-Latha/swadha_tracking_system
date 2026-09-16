@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Select } from '../../components/ui';
+import { AlertCircle, Power, PlayCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Select, Modal } from '../../components/ui';
 import { PageHero } from '../../components/PageHero';
-import { Purpose } from '../../types';
+import { Purpose, Session } from '../../types';
 import { sessionService } from '../../services/sessionService';
 
 export default function StudentLogin() {
@@ -12,9 +12,23 @@ export default function StudentLogin() {
   const [purpose, setPurpose] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeSession, setActiveSession] = useState<Session | null>(null);
+  const [isEndModalOpen, setIsEndModalOpen] = useState(false);
 
   // Read-only machine ID as per requirements
   const machineId = 'MACHINE-001';
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('currentSession');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.status === 'ACTIVE') {
+          setActiveSession(parsed);
+        }
+      }
+    } catch (e) {}
+  }, []);
 
   const purposeOptions = [
     { label: 'Skilling Course', value: Purpose.SKILLING_COURSE },
@@ -52,6 +66,11 @@ export default function StudentLogin() {
     }
   };
 
+  const handleConfirmEndSession = () => {
+    setIsEndModalOpen(false);
+    navigate('/student/condition');
+  };
+
   return (
     <>
       <PageHero
@@ -59,7 +78,39 @@ export default function StudentLogin() {
         subtitle="Please check in to start your common machine session."
       />
       <section className="bg-swadha-light py-12 md:py-16">
-        <div className="max-w-md mx-auto px-4">
+        <div className="max-w-md mx-auto px-4 space-y-6">
+          {/* Active Session Warning Banner */}
+          {activeSession && (
+            <div className="bg-white border-2 border-emerald-500 rounded-sm shadow-md p-5">
+              <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                Active Session Detected
+              </div>
+              <p className="text-sm text-slate-700 font-medium">
+                Student <span className="font-bold text-slate-900">{activeSession.studentId}</span> is currently logged into <span className="font-bold text-slate-900">{activeSession.machineId}</span>.
+              </p>
+              <div className="mt-4 flex flex-col sm:flex-row gap-2.5">
+                <Button
+                  type="button"
+                  onClick={() => navigate('/student/session')}
+                  className="flex-1 bg-swadha-green hover:bg-swadha-greenDark text-white text-xs gap-1.5"
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  Resume Session
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setIsEndModalOpen(true)}
+                  className="flex-1 text-xs gap-1.5"
+                >
+                  <Power className="w-4 h-4" />
+                  End Session
+                </Button>
+              </div>
+            </div>
+          )}
+
           <Card className="shadow-xl border-t-4 border-t-swadha-green rounded-sm">
             <CardHeader className="text-center pb-4">
               <CardTitle className="text-2xl font-bold text-swadha-dark tracking-tight">
@@ -113,6 +164,27 @@ export default function StudentLogin() {
           </Card>
         </div>
       </section>
+
+      {/* Confirmation Modal for Ending Session */}
+      <Modal
+        isOpen={isEndModalOpen}
+        onClose={() => setIsEndModalOpen(false)}
+        title="End Machine Session?"
+      >
+        <p className="text-slate-600 mb-6">
+          Are you sure you want to end active session on <strong className="text-slate-900">{activeSession?.machineId}</strong>?
+          You will proceed to confirm machine condition before you can log in again.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="outline" onClick={() => setIsEndModalOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleConfirmEndSession} className="gap-2">
+            <Power className="w-4 h-4" />
+            End Session
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 }
